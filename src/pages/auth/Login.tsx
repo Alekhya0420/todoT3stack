@@ -11,6 +11,7 @@ const Login = () => {
     onSuccess: (data) => {
       setMessage("✅ Login successful!");
       localStorage.setItem("userId", data.userId);
+      localStorage.setItem("user", JSON.stringify({name:data.userName}));
       window.location.href = "/"; 
     },
     onError: (error) => setMessage(`❌ ${error.message}`),

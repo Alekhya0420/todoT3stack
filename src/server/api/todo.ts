@@ -1,7 +1,6 @@
-
 import { z } from "zod";
-import { router, publicProcedure } from "./trpc";
-import { prisma } from "../db/client";
+import {router,publicProcedure} from "./trpc";
+import {prisma} from "../db/client";
 
 export const todoRouter = router({
   getTodos: publicProcedure
@@ -87,6 +86,5 @@ export const todoRouter = router({
 
     return { message: "Todos reordered successfully" };
   }),
-
 
 });

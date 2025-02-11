@@ -18,7 +18,7 @@ export const authRouter = router({
       }
 
       return await prisma.user.create({
-        data: { username: input.username, password: input.password },
+        data: {username:input.username,password:input.password},
       });
     }),
 
@@ -33,7 +33,7 @@ export const authRouter = router({
         throw new Error("Invalid email or password.");
       }
 
-      return { message: "Login successful", userId: user.id };
+      return { message: "Login successful", userId: user.id,userName:user.username};
     }),
 
     logoutUser: publicProcedure.mutation(async () => {
