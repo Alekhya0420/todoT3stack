@@ -39,4 +39,13 @@ export const authRouter = router({
     logoutUser: publicProcedure.mutation(async () => {
       return { message: "Logout successful" };
     }),
+
+    getAllUsers: publicProcedure.query(async () => {
+      return await prisma.user.findMany({
+        select: {
+          id: true,
+          username: true,
+        },
+      });
+    }),
 });
