@@ -10,10 +10,12 @@ export default function Home() {
   const [editText, setEditText] = useState("");
   const[username,setName] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(0);
+  const todosPerPage = 3;
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user") || "{}"); 
-    setName(storedUser.name || "Guest"); // Default to "Guest" if name is missing
+    setName(storedUser.name || "Guest");
   }, []);
   
   
@@ -41,7 +43,7 @@ export default function Home() {
   const addTodo = trpc.todo.addTodo.useMutation({ onSuccess: () => refetch() });
   const toggleTodo = trpc.todo.toggleTodo.useMutation({ onSuccess: () => refetch() });
   const deleteTodo = trpc.todo.deleteTodo.useMutation({ onSuccess: () => refetch() });
-  const editTodo = trpc.todo.editTodo.useMutation({ onSuccess: () => refetch() });
+  const editTodo = trpc.todo.editTodo.useMutation({ onSuccess: ()=>refetch()});
 
   const [title, setTitle] = useState("");
   const [text, setText] = useState("");
@@ -64,19 +66,18 @@ export default function Home() {
 
   const handleSaveEdit = () => {
     if (editTitle.trim() && editText.trim()) {
-      editTodo.mutate({ id: editingId, title: editTitle, text: editText });
+      editTodo.mutate({id:editingId,title:editTitle,text:editText});
       setEditingId(null);
       setEditTitle("");
       setEditText("");
     }
   };
- 
-  const filteredTodos = todos?.filter(todo =>
-    todo.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    todo.text.toLowerCase().includes(searchQuery.toLowerCase())
+    
+  const filteredTodos = (todos || []).filter(todo =>
+    todo.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    todo.text?.toLowerCase().includes(searchQuery.toLowerCase())
   );
- 
-
+  
   const reorderTodos = trpc.todo.reorderTodos.useMutation({ onSuccess: () => refetch() });
 
   const handleDragEnd = (result) => {
@@ -91,6 +92,25 @@ export default function Home() {
       orderedTodoIds: reorderedTodos.map((todo) => todo.id) 
     });
   };
+  //pagination logic starts here
+  const indexOfLastTodo = (currentPage + 1) * todosPerPage; // Shift index calculation
+  const indexOfFirstTodo = indexOfLastTodo - todosPerPage;
+  const currentTodos = filteredTodos.slice(indexOfFirstTodo, indexOfLastTodo);
+  const totalPages = Math.ceil(filteredTodos.length / todosPerPage);
+
+
+  const handleNextPage = () => {
+    if (currentPage + 1 < totalPages) {
+      setCurrentPage(prev => prev + 1);
+    }
+  };
+  
+  const handlePrevPage = () => {
+    if (currentPage > 0) {  
+      setCurrentPage(prev => prev - 1);
+    }
+  };
+  //pagination logic ends here
   
 
   return (
@@ -118,8 +138,8 @@ export default function Home() {
         <Droppable droppableId="todo-list">
           {(provided) => (
             <ul className="w-full max-w-lg mt-6 space-y-4" {...provided.droppableProps} ref={provided.innerRef}>
-              {filteredTodos?.length > 0 ? (
-                filteredTodos.map((todo, index) => (
+              {currentTodos?.length > 0 ? (
+                currentTodos.map((todo, index) => (
                   <Draggable key={todo.id} draggableId={todo.id.toString()} index={index}>
                     {(provided) => (
                       <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} className="bg-gray-800 p-4 rounded-lg flex justify-between items-center shadow-md hover:shadow-lg">
@@ -130,11 +150,23 @@ export default function Home() {
                             <button onClick={handleSaveEdit} className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">Save</button>
                           </div>
                         ) : (
-                          <div className="flex w-full justify-between items-center space-x-4">
+                          <div className="flex w-full justify-between items-center space-x-5">
                             <div className="cursor-pointer" onClick={() => toggleTodo.mutate({ id: todo.id })}>
-                              <div style={{ display: "flex", gap: "10px" }}>
-                                <p className="font-semibold text-lg text-blue-300">{todo.title}</p>
-                                <p className={`text-lg ${todo.completed ? "line-through text-gray-400" : "text-white"}`}>{todo.text}</p>
+                              <div style={{ display: "flex", gap: "30px" }}>
+
+  <p className="font-semibold text-lg text-blue-300">{todo.title}</p>   
+  <p className={`text-lg text-white ${todo.completed ? "line-through text-gray-400" : ""}`}>
+  {todo.text.length > 9 ? `${todo.text.slice(0, 9)}...` : todo.text}
+  </p>
+                
+            <p className={`text-sm ${todo.completed ? "line-through text-gray-400 mt-2" : "text-blue-500"}`}>
+                {new Date(todo.createdTime).toLocaleDateString()}
+            </p>
+
+            <p className={`text-sm ${todo.completed ? "line-through text-gray-400 mt-2" : "text-blue-500"}`}>
+                {todo.finishedTime?new Date(todo.finishedTime).toLocaleDateString():"Fullfill commitment first"}
+            </p>
+
                               </div>
                             </div>
                             <div className="flex space-x-3">
@@ -157,6 +189,23 @@ export default function Home() {
           )}
         </Droppable>
       </DragDropContext>
+
+<div className="mt-4 flex gap-2">
+<button onClick={handlePrevPage}  
+className="px-5 py-2 bg-gray-800 text-white rounded-lg shadow-md hover:bg-gray-600 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+>Prev</button>
+
+<span className="text-lg font-semibold text-white bg-red-700 px-4 py-2 rounded-lg shadow-md">
+{currentPage+1}/{totalPages}
+</span>
+
+<button onClick={handleNextPage}  
+  className="px-5 py-2 bg-gray-800 text-white rounded-lg shadow-md hover:bg-gray-600 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+>
+Next</button>
+</div>
+
+      
     </div>
   );
 }

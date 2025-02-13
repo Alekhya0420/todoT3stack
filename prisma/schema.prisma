@@ -22,4 +22,6 @@ model Todo {
   userId    String
   user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
   order     Int     @default(0)
+  createdTime DateTime @default(now())
+  finishedTime DateTime?
 }

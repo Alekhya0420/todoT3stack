@@ -35,7 +35,10 @@ export const todoRouter = router({
 
       return await prisma.todo.update({
         where: { id: input.id },
-        data: { completed: !todo.completed },
+        data: { 
+          completed: !todo.completed,
+          finishedTime: !todo.completed ? new Date() : null, 
+         },
       });
     }),
 

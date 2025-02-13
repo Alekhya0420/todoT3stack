@@ -20,11 +20,11 @@ const Admin = () => {
 
   
   const pieData = [
-    { name: "Completed Todos", value: completedTodos },
-    { name: "Pending Todos", value: pendingTodos }
+    {name:"Completed Todos",value:completedTodos},
+    {name:"Pending Todos",value:pendingTodos}
   ];
 
-  const COLORS = ["#00C49F", "#FF4444"];
+  const COLORS = ["#00C49F","#FF4444"];
 
   // Pagination logic
   const indexOfLastUser = currentPage * usersPerPage;
@@ -139,19 +139,26 @@ const Admin = () => {
 
       {/* Selected User's Tasks Section */}
       {selectedUser && (
-        <div className="mt-6 bg-gray-800 p-6 rounded-lg">
-          <h2 className="text-xl font-semibold mb-4">Tasks for {selectedUser.username}</h2>
+        <div className="mt-6 bg-gray-900 p-6 rounded-lg">
+          <h2 className="text-xl font-bold text-green-300 mb-4">Tasks for {selectedUser.username}</h2>
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-gray-700">
-                <th className="p-2">Task</th>
-                <th className="p-2">Status</th>
+                <th className="p-2 text-red-500">Task</th>
+                <th className="p-2 text-red-500">Description</th>
+                <th className="p-2 text-red-500">Commitment Time</th>
+                <th className="p-2 text-red-500">Fulfill Time</th>
+                <th className="p-2 text-red-500">Status</th>
               </tr>
             </thead>
             <tbody>
               {selectedUser.todos.map((todo) => (
                 <tr key={todo.id} className="border-b border-gray-700">
                   <td className="p-2">{todo.title}</td>
+                  <td className="p-2">{todo.text}</td>
+                  <td className="p-2">{new Date(todo.createdTime).toLocaleString()}</td>
+                  <td className="p-2">{todo.finishedTime?new Date(todo.finishedTime).toLocaleString():
+                  "Fullfill commitment OR DONT MAKE PROMISE"}</td>
                   <td className={`p-2 ${todo.completed ? "text-green-400" : "text-red-400"}`}>
                     {todo.completed ? "Completed" : "Pending"}
                   </td>

@@ -28,12 +28,12 @@ export const authRouter = router({
       password: z.string().min(6),
     }))
     .mutation(async ({ input }) => {
-      const user = await prisma.user.findUnique({ where: { username: input.username } });
+      const user = await prisma.user.findUnique({where:{username:input.username}});
       if (!user || user.password !== input.password) {
         throw new Error("Invalid email or password.");
       }
 
-      return { message: "Login successful", userId: user.id,userName:user.username};
+      return {message:"Login successful",userId:user.id,userName:user.username};
     }),
 
     logoutUser: publicProcedure.mutation(async () => {
