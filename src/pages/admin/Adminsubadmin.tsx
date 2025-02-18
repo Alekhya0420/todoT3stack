@@ -10,7 +10,7 @@ const Adminsubadmin = () => {
   const { data: registeredUsers, isLoading: registeredUsersLoading } = trpc.auth.getAllUsers.useQuery();
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
+    const user = JSON.parse(localStorage.getItem("subadmin"));
     if (user) {
       setSubadmin(user.name);
     }
@@ -48,6 +48,7 @@ const Adminsubadmin = () => {
   const pendingTodos = totalTodos - completedTodos;
 
   const backtoOld = () => {
+    localStorage.removeItem("subadmin");
     router.push("/admin/Admin");
   };
 
@@ -158,7 +159,7 @@ const Adminsubadmin = () => {
           className="bg-red-500 text-white px-4 py-2 rounded"
           onClick={backtoOld}
         >
-          Back to old page
+          Logout
         </button>
       </div>
 

@@ -49,7 +49,8 @@ const Admin = () => {
 
   const handleJoinSubadmin = () => {
     if (isSubadminJoinEnabled) {
-      router.push("/admin/Adminsubadmin");
+      // router.push("/admin/Adminsubadmin");
+      router.push("/admin/Subadminlogin")
     }
   };
 
