@@ -25,8 +25,8 @@ const Subadminlogin = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black to-purple-800 p-6">
-      <div className="bg-gray-900 text-white p-8 rounded-xl shadow-lg max-w-md w-full">
+    <div className="min-h-screen flex items-center justify-center bg-gray-900 p-6 border-solid border-2">
+      <div className="bg-gray-900 text-white p-8 border-solid border-5 border-red-500 rounded-xl shadow-cyan-700 shadow-md max-w-md w-full">
         <h2 className="text-3xl font-extrabold text-center text-yellow-400 mb-6">Subadmin Login</h2>
 
         <form onSubmit={handleLogin} className="space-y-4">
