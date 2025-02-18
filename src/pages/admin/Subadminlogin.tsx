@@ -25,9 +25,9 @@ const Subadminlogin = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-700 to-purple-800 p-6">
+    <div className="min-h-screen flex items-center justify-center bg-black to-purple-800 p-6">
       <div className="bg-gray-900 text-white p-8 rounded-xl shadow-lg max-w-md w-full">
-        <h2 className="text-3xl font-extrabold text-center text-yellow-400 mb-6">Login</h2>
+        <h2 className="text-3xl font-extrabold text-center text-yellow-400 mb-6">Subadmin Login</h2>
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
@@ -67,12 +67,6 @@ const Subadminlogin = () => {
           </p>
         )}
 
-        <p className="text-sm text-gray-400 text-center mt-4">
-          Don't have an account?{" "}
-          <a href="/auth/Registration" className="text-yellow-400 hover:underline">
-            Register here
-          </a>
-        </p>
       </div>
     </div>
   );
