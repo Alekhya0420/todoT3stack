@@ -13,19 +13,32 @@ export const todoRouter = router({
 
     getAllUsersWithTodos: publicProcedure.query(async()=>{
       return await prisma.user.findMany({
-        include: {
-          todos: true, 
+        include:
+        {
+        todos: true, 
         },
       });
     }),
 
   addTodo: publicProcedure
-    .input(z.object({ title: z.string().min(1), text: z.string().min(1), userId: z.string() }))
-    .mutation(async ({ input }) => {
-      return await prisma.todo.create({
-        data: { title: input.title, text: input.text, completed: false, userId: input.userId },
-      });
-    }),
+  .input(z.object({ 
+    title: z.string().min(1), 
+    text: z.string().min(1), 
+    userId: z.string(),
+    createdTime: z.string().optional() 
+  }))
+  .mutation(async({input}) => {
+    return await prisma.todo.create({
+      data: { 
+        title: input.title, 
+        text: input.text, 
+        completed: false, 
+        userId: input.userId,
+        createdTime: new Date(input.createdTime)
+      },
+    });
+  }),
+
 
   toggleTodo: publicProcedure
     .input(z.object({ id: z.string() }))

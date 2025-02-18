@@ -4,12 +4,35 @@ import {useState} from "react";
 import {PieChart,Pie,Cell,Tooltip,Legend,ResponsiveContainer} from "recharts";
 
 const Admin = () => {
-  const {data:users,isLoading:usersLoading} = trpc.todo.getAllUsersWithTodos.useQuery();
+
+  const [userId, setUserId] = useState(null);
+  
+  const {data:users,isLoading:usersLoading,refetch} = trpc.todo.getAllUsersWithTodos.useQuery();
   const {data:registeredUsers,isLoading:registeredUsersLoading} = trpc.auth.getAllUsers.useQuery();
+ 
+
+  console.log("todo user",users);
+  console.log("registered user",registeredUsers);
+
+  const deleteTodo = trpc.todo.deleteTodo.useMutation({
+    onSuccess: () => {
+      refetch();
+    }
+  });
+
+  const updateTodo = trpc.todo.editTodo.useMutation({
+    onSuccess: () => {
+      refetch();  
+      setEditTodo(null);  
+    },
+  });
 
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [editTodo, setEditTodo] = useState(null);
   const usersPerPage = 5;
+
+  console.log("users are", users);
 
   if (usersLoading || registeredUsersLoading) return <p>Loading...</p>;
 
@@ -18,13 +41,12 @@ const Admin = () => {
   const completedTodos = users?.flatMap(user => user.todos).filter(todo => todo.completed).length || 0;
   const pendingTodos = totalTodos - completedTodos;
 
-  
   const pieData = [
-    {name:"Completed Todos",value:completedTodos},
-    {name:"Pending Todos",value:pendingTodos}
+    { name: "Completed Todos", value: completedTodos },
+    { name: "Pending Todos", value: pendingTodos },
   ];
 
-  const COLORS = ["#00C49F","#FF4444"];
+  const COLORS = ["#00C49F", "#FF4444"];
 
   // Pagination logic
   const indexOfLastUser = currentPage * usersPerPage;
@@ -32,9 +54,26 @@ const Admin = () => {
   const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
   const totalPages = Math.ceil(users.length / usersPerPage);
 
-  
   const handleUserClick = (user) => {
     setSelectedUser(user);
+  };
+
+  const handleEditTodo = (todo) => {
+    setEditTodo(todo);
+  };
+
+  const handleSaveEdit = () => {
+    if (editTodo) 
+    {
+      updateTodo.mutate({
+        id: editTodo.id,
+        title: editTodo.title,
+        text: editTodo.text,
+        completed: editTodo.completed,
+        createdTime: editTodo.createdTime,
+        finishedTime: editTodo.finishedTime,
+      });
+    }
   };
 
   return (
@@ -84,7 +123,6 @@ const Admin = () => {
         </ResponsiveContainer>
       </div>
 
-
       <div className="mt-6 bg-gray-800 p-6 rounded-lg">
         <h2 className="text-xl font-semibold mb-4">Registered Users & Their Todos</h2>
         <table className="w-full text-left border-collapse">
@@ -102,9 +140,9 @@ const Admin = () => {
               return (
                 <tr key={user.id} className="border-b border-gray-700">
                   <td className="p-2">{user.id}</td>
-                  <td 
+                  <td
                     className="p-2 text-blue-400 cursor-pointer hover:underline"
-                    onClick={() => handleUserClick(user)}
+                    onClick={()=>handleUserClick(user)}
                   >
                     {user.username}
                   </td>
@@ -120,7 +158,7 @@ const Admin = () => {
         {/* Pagination */}
         <div className="flex justify-center mt-4">
           <button
-            onClick={()=>setCurrentPage((prev)=>Math.max(prev-1,1))}
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
             className="bg-blue-500 text-white px-3 py-1 rounded mx-1 disabled:opacity-50"
           >
@@ -149,6 +187,7 @@ const Admin = () => {
                 <th className="p-2 text-red-500">Commitment Time</th>
                 <th className="p-2 text-red-500">Fulfill Time</th>
                 <th className="p-2 text-red-500">Status</th>
+                <th className="p-2 text-red-500">Control</th>
               </tr>
             </thead>
             <tbody>
@@ -157,21 +196,84 @@ const Admin = () => {
                   <td className="p-2">{todo.title}</td>
                   <td className="p-2">{todo.text}</td>
                   <td className="p-2">{new Date(todo.createdTime).toLocaleString()}</td>
-                  <td className="p-2">{todo.finishedTime?new Date(todo.finishedTime).toLocaleString():
-                  "Fullfill commitment OR DONT MAKE PROMISE"}</td>
+                  <td className="p-2">
+                    {todo.finishedTime
+                      ? new Date(todo.finishedTime).toLocaleString()
+                      : "Fulfill commitment OR DONT MAKE PROMISE"}
+                  </td>
                   <td className={`p-2 ${todo.completed ? "text-green-400" : "text-red-400"}`}>
-                    {todo.completed ? "Completed" : "Pending"}
+                    {todo.completed?"Completed":"Pending"}
+                  </td>
+                  <td className="p-2">
+                    <button
+                      className="text-green-500 mx-2 bg-gray-800 px-4 py-2 rounded"
+                      onClick={() => handleEditTodo(todo)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="text-red-500 mx-2 bg-gray-800 px-4 py-2 rounded"
+                      onClick={() => deleteTodo.mutate({ id: todo.id })}
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-          <button 
-            onClick={() => setSelectedUser(null)} 
-            className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
-          >
-            Close
-          </button>
+        </div>
+      )}
+
+      {/* Edit Todo Modal */}
+      {editTodo && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-gray-800 p-6 rounded-lg w-96">
+            <h2 className="text-xl font-bold text-green-300 mb-4">Edit Task</h2>
+            <form>
+              <div className="mb-4">
+                <label htmlFor="title" className="block text-sm font-medium text-white">
+                  Task Title
+                </label>
+                <input
+                  id="title"
+                  type="text"
+                  value={editTodo.title}
+                  onChange={(e) => setEditTodo({ ...editTodo, title: e.target.value })}
+                  className="mt-1 px-3 py-2 w-full rounded bg-gray-800 text-white"
+                />
+              </div>
+
+              <div className="mb-4">
+                <label htmlFor="description" className="block text-sm font-medium text-white">
+                  Task Description
+                </label>
+                <textarea
+                  id="description"
+                  value={editTodo.text}
+                  onChange={(e) => setEditTodo({ ...editTodo, text: e.target.value })}
+                  className="mt-1 px-3 py-2 w-full rounded bg-gray-800 text-white"
+                />
+              </div>
+
+              <div className="flex justify-between">
+                <button
+                  type="button"
+                  onClick={() => setEditTodo(null)}
+                  className="bg-red-500 text-white px-4 py-2 rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveEdit}
+                  className="bg-green-500 text-white px-4 py-2 rounded"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

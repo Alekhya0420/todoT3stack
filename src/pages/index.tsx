@@ -12,6 +12,8 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
   const todosPerPage = 3;
+  const [createdTime, setCreatedTime] = useState("");
+
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user") || "{}"); 
@@ -39,6 +41,7 @@ export default function Home() {
     { userId },
     { enabled: !!userId }
   );
+  console.log("todos are",todos);
 
   const addTodo = trpc.todo.addTodo.useMutation({ onSuccess: () => refetch() });
   const toggleTodo = trpc.todo.toggleTodo.useMutation({ onSuccess: () => refetch() });
@@ -47,16 +50,24 @@ export default function Home() {
 
   const [title, setTitle] = useState("");
   const [text, setText] = useState("");
+  
 
   const handleAddTodo = useMemo(() => {
     return () => {
       if (title.trim() && text.trim()) {
-        addTodo.mutate({ title, text, userId });
+        addTodo.mutate({ 
+          title, 
+          text, 
+          userId, 
+          createdTime 
+        });
         setTitle("");
         setText("");
+        setCreatedTime(""); 
       }
     };
-  }, [title, text, userId, addTodo]);
+  }, [title,text,userId,createdTime,addTodo]);
+  
 
   const handleEdit = (todo) => {
     setEditingId(todo.id);
@@ -129,7 +140,16 @@ export default function Home() {
       <div className="bg-gray-700 p-6 rounded-lg shadow-lg w-full max-w-lg">
         <input type="text" className="w-full p-3 rounded-md mb-3 bg-gray-900 text-white border border-gray-600" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
         <div className="flex">
-          <input type="text" className="flex-1 p-3 rounded-l-md bg-gray-900 text-white border border-gray-600" placeholder="Task description..." value={text} onChange={(e) => setText(e.target.value)} />
+          <input type="text" className=" p-3 rounded-l-md bg-gray-900 text-white border border-gray-600" placeholder="Task description..." value={text} onChange={(e) => setText(e.target.value)}/>
+          
+        <span className="text-white">Task Time:</span>  
+        <input 
+          type="date" 
+          className="w-full p-3 rounded-l-md bg-gray-900 text-white border border-gray-600 "
+          value={createdTime}
+          onChange={(e) => setCreatedTime(e.target.value)}
+         />
+
           <button onClick={handleAddTodo} className="bg-blue-500 px-6 py-3 rounded-r-md hover:bg-blue-600 transition duration-200">Add</button>
         </div>
       </div>
@@ -154,7 +174,10 @@ export default function Home() {
                             <div className="cursor-pointer" onClick={() => toggleTodo.mutate({ id: todo.id })}>
                               <div style={{ display: "flex", gap: "30px" }}>
 
-  <p className="font-semibold text-lg text-blue-300">{todo.title}</p>   
+  <p className={`text-lg text-white ${todo.completed ? "line-through text-gray-400" : ""}`}>
+    
+  {todo.title.length > 9 ? `${todo.title.slice(0,7)}...` : todo.title}</p>   
+
   <p className={`text-lg text-white ${todo.completed ? "line-through text-gray-400" : ""}`}>
   {todo.text.length > 9 ? `${todo.text.slice(0, 9)}...` : todo.text}
   </p>
