@@ -7,15 +7,28 @@ const Subadminlogin = () => {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
 
-  const loginUser = trpc.auth.loginUser.useMutation({
+
+const loginUser = trpc.auth.loginUser.useMutation({
     onSuccess: (data) => {
       setMessage("✅ Login successful!");
       localStorage.setItem("userId", data.userId);
-      localStorage.setItem("subadmin", JSON.stringify({name:data.userName}));
-      window.location.href = "/admin/Adminsubadmin"; 
+  
+      
+      if (!localStorage.getItem("subadmin")) 
+      {
+        localStorage.setItem("subadmin", JSON.stringify({ name: data.userName }));
+      } 
+      else 
+      {
+        setMessage("❌ A subadmin is already logged in. Please let him log out first.");
+        return;
+      }
+  
+      window.location.href = "/admin/Adminsubadmin";
     },
-    onError: (error) => setMessage(`❌ ${error.message}`),
+    onError: (error) => setMessage(`PLEASE,PROVIDE CORRECT CREDENTIALS`)
   });
+  
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +39,7 @@ const Subadminlogin = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900 p-6 border-solid border-2">
-      <div className="bg-gray-900 text-white p-8 border-solid border-5 border-red-500 rounded-xl shadow-cyan-700 shadow-md max-w-md w-full">
+      <div className="bg-gray-900 text-white p-8 border-solid border-5 border-cyan-900 border-t rounded-xl shadow-cyan-900 shadow-md max-w-md w-full">
         <h2 className="text-3xl font-extrabold text-center text-yellow-400 mb-6">Subadmin Login</h2>
 
         <form onSubmit={handleLogin} className="space-y-4">

@@ -12,8 +12,6 @@ const Admin = () => {
   const {data:users,isLoading:usersLoading,refetch} = trpc.todo.getAllUsersWithTodos.useQuery();
   const {data:registeredUsers,isLoading:registeredUsersLoading} = trpc.auth.getAllUsers.useQuery();
   
-  
-
   console.log("todo user",users);
   console.log("registered user",registeredUsers);
 
@@ -44,15 +42,22 @@ const Admin = () => {
   const completedTodos = users?.flatMap(user => user.todos).filter(todo => todo.completed).length || 0;
   const pendingTodos = totalTodos - completedTodos;
 
-  
-
 
   const handleJoinSubadmin = () => {
-    if (isSubadminJoinEnabled) {
-      // router.push("/admin/Adminsubadmin");
-      router.push("/admin/Subadminlogin")
+    const subadmin = localStorage.getItem("subadmin");
+  
+    if (subadmin && isSubadminJoinEnabled) {
+      router.push("/admin/Adminsubadmin");
+    } else if (subadmin && !isSubadminJoinEnabled) {
+      router.push("/admin/Admin");
+    } else if (!subadmin && isSubadminJoinEnabled) {
+      router.push("/admin/Subadminlogin");
+    } else {
+      router.push("/admin/Admin");
     }
   };
+  
+  
 
   const handleDisableButton = () => {
     setIsSubadminJoinEnabled(!isSubadminJoinEnabled);

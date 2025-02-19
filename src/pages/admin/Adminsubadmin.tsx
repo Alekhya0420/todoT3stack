@@ -80,7 +80,7 @@ const Adminsubadmin = () => {
 
   return (
     <div className="p-6 bg-gray-900 min-h-screen text-white">
-      <h1 className="text-2xl font-bold text-red-500 mb-4">Welcome {subadmin}</h1>
+      <h1 className="text-2xl font-bold text-red-500 mb-4">Welcome Subadmin respected {subadmin}</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-gray-800 p-6 rounded-lg text-center">
@@ -194,16 +194,14 @@ const Adminsubadmin = () => {
                   </td>
                   <td className="p-2">
                     <button
-                      className={`text-green-500 mx-2 bg-gray-800 px-4 py-2 rounded ${subadmin === selectedUser.username ? "" : "disabled:opacity-50"}`}
+                      className={`text-green-500 mx-2 bg-gray-800 px-4 py-2 rounded ${subadmin === selectedUser.username ? "" : "opacity-50 cursor-not-allowed"}`}
                       onClick={() => subadmin === selectedUser.username && handleEditTodo(todo)}
-                      disabled={subadmin !== selectedUser.username}
                     >
                       Edit
                     </button>
                     <button
-                      className={`text-red-500 mx-2 bg-gray-800 px-4 py-2 rounded ${subadmin === selectedUser.username ? "" : "disabled:opacity-50"}`}
+                      className={`text-red-500 mx-2 bg-gray-800 px-4 py-2 rounded ${subadmin === selectedUser.username ? "" : "opacity-50 cursor-not-allowed"}`}
                       onClick={() => subadmin === selectedUser.username && deleteTodo.mutate({ id: todo.id })}
-                      disabled={subadmin !== selectedUser.username}
                     >
                       Delete
                     </button>
@@ -215,34 +213,39 @@ const Adminsubadmin = () => {
 
           {/* Edit Todo Section */}
           {editTodo && (
-            <div className="mt-6 bg-gray-800 p-6 rounded-lg">
-              <h2 className="text-xl font-semibold text-red-500 mb-4">Edit Todo</h2>
-              <input
-                type="text"
-                value={editTodo.title}
-                onChange={(e) => setEditTodo({ ...editTodo, title: e.target.value })}
-                className="w-full mb-4 p-2 text-black rounded"
-              />
-              <textarea
-                value={editTodo.text}
-                onChange={(e) => setEditTodo({ ...editTodo, text: e.target.value })}
-                className="w-full mb-4 p-2 text-black rounded"
-              />
-              <div className="flex justify-between">
-                <button
-                  className="bg-green-500 text-white px-4 py-2 rounded"
-                  onClick={handleSaveEdit}
-                >
-                  Save
-                </button>
-                <button
-                  className="bg-red-500 text-white px-4 py-2 rounded"
-                  onClick={() => setEditTodo(null)}
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
+      <div className="mt-6 bg-gray-900 p-6 rounded-lg shadow-lg">
+        <h2 className="text-2xl font-semibold text-red-500 mb-4 text-center">
+        Edit Todo
+        </h2>
+        <input
+          type="text"
+          value={editTodo.title}
+          onChange={(e) => setEditTodo({ ...editTodo, title: e.target.value })}
+          className="w-full mb-3 p-2 rounded-md bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+          placeholder="Enter title..."
+        />
+      <textarea
+          value={editTodo.text}
+          onChange={(e) => setEditTodo({ ...editTodo, text: e.target.value })}
+          className="w-full mb-3 p-2 rounded-md bg-gray-800 text-white border border-gray-700 h-28 focus:outline-none focus:ring-2 focus:ring-red-500"
+          placeholder="Enter description..."
+        />
+      <div className="flex justify-end space-x-2">
+          <button
+          className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md text-sm transition-all duration-300"
+          onClick={handleSaveEdit}
+        >
+        Save
+      </button>
+    <button
+      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm transition-all duration-300"
+      onClick={() => setEditTodo(null)}
+    >
+      Cancel
+    </button>
+  </div>
+</div>
+
           )}
         </div>
       )}

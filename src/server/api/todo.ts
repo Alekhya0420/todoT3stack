@@ -7,16 +7,16 @@ export const todoRouter = router({
     .input(z.object({ userId: z.string().optional() }))
     .query(async ({ input }) => {
       return await prisma.todo.findMany({
-        where: { userId: input.userId },
+        where: {userId:input.userId},
       });
     }),
 
     getAllUsersWithTodos: publicProcedure.query(async()=>{
       return await prisma.user.findMany({
-        include:
-        {
-        todos: true, 
-        },
+      include:
+      {
+      todos: true, 
+      },
       });
     }),
 

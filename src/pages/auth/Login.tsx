@@ -14,7 +14,7 @@ const Login = () => {
       localStorage.setItem("user", JSON.stringify({name:data.userName}));
       window.location.href = "/"; 
     },
-    onError: (error) => setMessage(`❌ ${error.message}`),
+    onError: (error) => setMessage(`PLEASE,ENTER VALID CREDENTIALS`),
   });
 
   const handleLogin = async (e: React.FormEvent) => {
