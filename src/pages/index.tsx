@@ -247,7 +247,7 @@ className="bg-gradient-to-r from-gray-900 via-black to-gray-800 p-6 rounded-3xl 
                 </p>
                 
                     </div>
-                  </div>
+                </div>
                   <div>
                     <button
                       onClick={() => handleEdit(todo)}
@@ -271,6 +271,62 @@ className="bg-gradient-to-r from-gray-900 via-black to-gray-800 p-6 rounded-3xl 
         )}
       </div>
 
+      <div className="w-full max-w-2xl mt-6 flex justify-between">
+  {/* In Progress Column */}
+  <div className="w-1/2 bg-gray-800 p-4 rounded-lg shadow-lg">
+    <h3 className="text-xl font-bold text-green-400 mb-2">In Progress</h3>
+    {currentTodos.filter(todo => !todo.completed).length > 0 ? (
+      currentTodos
+        .filter(todo => !todo.completed)
+        .map(todo => (
+          <div key={todo.id} className="bg-gray-700 p-3 rounded-md mb-2">
+            <p className="text-white text-lg">{todo.title}</p>
+            <p className="text-gray-300">{todo.text}</p>
+            <div className="flex justify-between mt-2">
+              <button onClick={() => toggleTodo.mutate({ id: todo.id })} className="bg-blue-500 px-3 py-1 rounded-md">
+                Mark Complete
+              </button>
+              <button onClick={() => handleEdit(todo)} className="bg-yellow-500 px-3 py-1 rounded-md">
+                Edit
+              </button>
+              <button onClick={() => deleteTodo.mutate({ id: todo.id })} className="bg-red-500 px-3 py-1 rounded-md">
+                Delete
+              </button>
+            </div>
+          </div>
+        ))
+    ) : (
+      <p className="text-gray-400">No tasks in progress</p>
+    )}
+  </div>
+
+  {/* Completed Column */}
+  <div className="w-1/2 bg-gray-800 p-4 rounded-lg shadow-lg ml-4">
+    <h3 className="text-xl font-bold text-red-400 mb-2">Completed</h3>
+    {currentTodos.filter(todo => todo.completed).length > 0 ? (
+      currentTodos
+        .filter(todo => todo.completed)
+        .map(todo => (
+          <div key={todo.id} className="bg-gray-700 p-3 rounded-md mb-2">
+            <p className="text-gray-400 text-lg line-through">{todo.title}</p>
+            <p className="text-gray-500 line-through">{todo.text}</p>
+            <div className="flex justify-between mt-2">
+              <button onClick={() => toggleTodo.mutate({ id: todo.id })} className="bg-green-500 px-3 py-1 rounded-md">
+                Mark In Progress
+              </button>
+              <button onClick={() => deleteTodo.mutate({ id: todo.id })} className="bg-red-500 px-3 py-1 rounded-md">
+                Delete
+              </button>
+            </div>
+          </div>
+        ))
+    ) : (
+      <p className="text-gray-400">No completed tasks</p>
+    )}
+  </div>
+</div>
+
+
       <div className="mt-4 flex justify-between w-full max-w-lg">
         <button
           onClick={handlePrevPage}
@@ -285,6 +341,10 @@ className="bg-gradient-to-r from-gray-900 via-black to-gray-800 p-6 rounded-3xl 
           Next
         </button>
       </div>
+
+
+    
+
     </div>
   );
 }
